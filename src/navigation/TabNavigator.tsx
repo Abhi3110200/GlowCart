@@ -1,8 +1,9 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Text, useColorScheme } from "react-native";
+import { useTheme } from "@react-navigation/native";
 import HomeScreen from "../screens/HomeScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { Text } from "react-native";
 import WishListScreen from "../screens/WishListScreen";
 import OfferScreen from "../screens/OfferScreen";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -11,9 +12,26 @@ import InActiveHomeIcon from "../assets/svg/InActiveHomeIcon";
 import InActiveOfferIcon from "../assets/svg/InActiveOfferIcon";
 import ActiveProfileIcon from "../assets/svg/ActiveProfileIcon";
 import InActiveProfileIcon from "../assets/svg/InActiveProfileIcon";
+import { useAppTheme } from "../theme/useAppTheme";
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
+  const { colors } = useTheme();
+  const { isDark } = useAppTheme();
+  
+  // const tabBarStyle = {
+  //   backgroundColor: colors.card,
+  //   height: 70,
+  //   paddingTop: 10,
+  //   borderTopColor: colors.border,
+  // };
+  
+  // const tabBarLabelStyle = (focused: boolean) => ({
+  //   fontFamily: 'Inter_18pt-Medium',
+  //   fontSize: 12,
+  //   color: focused ? colors.primary : colors.text,
+  //   marginBottom: 4,
+  // });
   return (
     <Tab.Navigator screenOptions={{
       headerShown: false,

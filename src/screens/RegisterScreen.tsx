@@ -1,12 +1,18 @@
 import { SafeAreaView } from "react-native-safe-area-context"
-import { Image, Text, TextInput, TouchableOpacity, View } from "react-native"
+import { ActivityIndicator, Image, Text, TextInput, TouchableOpacity, View } from "react-native"
 import { useState } from "react"
 import { Dimensions } from "react-native"
 import { StatusBar } from "react-native"
 import Ionicons from "react-native-vector-icons/Ionicons"
 import { useNavigation } from "@react-navigation/native"
-
+import { Alert } from "react-native"
+import { useAuth } from "../hooks/useAuth"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 const { height, width } = Dimensions.get("window")
+
+type RootStackParamList = {
+    Login: undefined;
+};
 
 const RegisterScreen = () => {
     const [email, setEmail] = useState("")
@@ -15,16 +21,33 @@ const RegisterScreen = () => {
     const [showPassword, setShowPassword] = useState(false)
     const [confirmPassword, setConfirmPassword] = useState("")
 
-    const navigation = useNavigation();
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const { register, setLoading, loading, setError } = useAuth();
 
-    const handleLogin = () => {
-        console.log("[v0] Login pressed with:", { email, password })
-        navigation.navigate("Tabs")
+    const handleRegister = () => {
+        if(!email || !password || !name || !confirmPassword) {
+            Alert.alert("Error", "All fields are required");
+            return;
+        }
+        if(password !== confirmPassword) {
+            Alert.alert("Error", "Passwords do not match");
+            return;
+        }
+        try {
+            setLoading(true);
+            register(email, password, name); 
+            navigation.goBack();   
+        } catch (error: any) {
+            setError(error.message);
+            console.error("Register failed:", error);
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: "#FFEDE8" , justifyContent: "space-between"}}>
-            <StatusBar barStyle="light-content" backgroundColor="#C9A7A2" />
+            <StatusBar barStyle="light-content" backgroundColor="#F1B0B0" />
             <View
                 style={{
                     height: height * 0.184,
@@ -158,11 +181,19 @@ const RegisterScreen = () => {
                         shadowRadius: 100,
                         elevation: 10,
                     }}
-                    onPress={() => handleLogin()}
+                    onPress={() => handleRegister()}
                 >
-                    <Text style={{ fontSize: 24, fontFamily: "Inter_18pt-Medium", color: "#fff", textAlign: "center" }}>
-                        Create Account
-                    </Text>
+                    {loading ? (
+                        <View style={{
+                            paddingVertical: 8,
+                        }}>
+                            <ActivityIndicator size="small" color="#fff" />
+                        </View>
+                    ) : (
+                        <Text style={{ fontSize: 24, fontFamily: "Inter_18pt-Medium", color: "#fff", textAlign: "center" }}>
+                            Create Account
+                        </Text>
+                    )}
                 </TouchableOpacity>
             </View>
 

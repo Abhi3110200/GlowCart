@@ -1,19 +1,21 @@
-import { View, Text, StatusBar, Image, Dimensions, ImageBackground, TouchableOpacity, StyleSheet, ScrollView } from "react-native"
-import { useRoute } from "@react-navigation/native"
-import { SafeAreaView } from "react-native-safe-area-context"
+import { View, Text, StatusBar, Dimensions, ImageBackground, TouchableOpacity, StyleSheet, ScrollView } from "react-native"
+import { useRoute, RouteProp } from "@react-navigation/native"
 import Ionicons from "react-native-vector-icons/Ionicons"
 import { useNavigation } from "@react-navigation/native"
 import BagIcon from "../assets/svg/BagIcon"
 import ShareIcon from "../assets/svg/ShareIcon"
-import { useEffect, useState } from "react"
+import { FC } from "react"
+import { useCart } from "../hooks/useCart"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 const { width } = Dimensions.get('window')
 
-interface Product {
+export interface Product {
     id: number;
     title: string;
     description: string;
     price: number;
     discountPercentage: number;
+    originalPrice: number;
     rating: number;
     stock: number;
     brand: string;
@@ -23,11 +25,21 @@ interface Product {
     images: string[];
 }
 
-const ProductDetailScreen = () => {
-    const route = useRoute()
-    const navigation = useNavigation()
+type ProductDetailScreenParams = {
+    product: Product;
+};
+
+type RootStackParamList = {
+    CartScreen: undefined;
+};
+
+const ProductDetailScreen: FC = () => {
+    const route = useRoute<RouteProp<{ params: ProductDetailScreenParams }>>()
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const { product } = route.params
     console.log(product)
+
+    const { addItem, items } = useCart()
 
     const renderStars = (rating: number, size: number) => {
         const stars = []
@@ -62,16 +74,26 @@ const ProductDetailScreen = () => {
     return (
         <ScrollView style={{ flex: 1, backgroundColor: '#FFEDE8' }} contentContainerStyle={{
             paddingHorizontal: 20,
-            paddingTop: 20,
-        }}>
+            paddingTop: 40,
+        }} scrollEnabled={true} showsVerticalScrollIndicator={false}>
             <StatusBar barStyle="dark-content" backgroundColor="#FFEDE8" />
             <ImageBackground source={{ uri: product.thumbnail }} style={{ width: '100%', height: 425, borderRadius: 16, backgroundColor: 'white' }} resizeMode="contain" >
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20 }}>
                     <TouchableOpacity onPress={() => navigation.goBack()} style={{ padding: 10, backgroundColor: '#FFEDE8', borderRadius: 12 }} >
                         <Ionicons name="arrow-back" size={width * 0.06} color="black" />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.goBack()} style={{ padding: 10, backgroundColor: '#FFEDE8', borderRadius: 12 }}>
-                        <BagIcon width={width * 0.06} height={width * 0.06} />
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('CartScreen')}
+                        style={styles.cartButton}
+                    >
+                        <BagIcon width={width * 0.06} height={width * 0.06} color="black" />
+                        {items.length > 0 && (
+                            <View style={styles.badge}>
+                                <Text style={styles.badgeText}>
+                                    {items.length > 9 ? '9+' : items.length}
+                                </Text>
+                            </View>
+                        )}
                     </TouchableOpacity>
                 </View>
             </ImageBackground>
@@ -82,7 +104,7 @@ const ProductDetailScreen = () => {
             <Text style={{ fontSize: 20, color: '#070707', fontFamily: 'Inter_18pt-SemiBold' }} numberOfLines={1}>{product.title}</Text>
             <Text style={{ fontSize: 14, color: '#333333', fontFamily: 'Inter_18pt-Regular', lineHeight: 21, letterSpacing: 0.2, marginVertical: 8 }}>{product.description}</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-                {renderStars(product.rating,19)}
+                {renderStars(product.rating, 19)}
                 <Text style={{ fontSize: 18, color: '#070707', fontFamily: 'Inter_18pt-Medium', marginLeft: 10 }}>{product.rating}</Text>
             </View>
             <View style={{
@@ -130,6 +152,7 @@ const ProductDetailScreen = () => {
                         borderRadius: 12
                     }}
                     activeOpacity={0.8}
+                    onPress={() => addItem(product)}
                 >
                     <Text style={{ color: "white", fontSize: 24, fontFamily: 'Inter_18pt-Medium' }}>
                         Add to Bag
@@ -174,22 +197,22 @@ const ProductDetailScreen = () => {
                 <Text style={styles.heading}>Ratings & Reviews</Text>
 
                 {product.reviews.map((review: any, index: any) => (
-                        <View key={index} style={styles.reviewCard}>
-                            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
-                                <View style={styles.avatar}>
-                                    <Text style={styles.avatarText}>{getInitials(review.reviewerName)}</Text>
-                                </View>
-                                <View style={{ flex: 1, marginLeft: 12 }}>
-                                    <Text style={styles.reviewerName}>{review.reviewerName}</Text>
-                                    <Text style={styles.reviewerEmail}>{review.reviewerEmail}</Text>
-                                </View>
-                                <View style={{ flexDirection: "row" }}>
-                                    {renderStars(review.rating,14)}
-                                </View>
+                    <View key={index} style={styles.reviewCard}>
+                        <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
+                            <View style={styles.avatar}>
+                                <Text style={styles.avatarText}>{getInitials(review.reviewerName)}</Text>
                             </View>
-                            <Text style={styles.reviewText}>{review.comment}</Text>
+                            <View style={{ flex: 1, marginLeft: 12 }}>
+                                <Text style={styles.reviewerName}>{review.reviewerName}</Text>
+                                <Text style={styles.reviewerEmail}>{review.reviewerEmail}</Text>
+                            </View>
+                            <View style={{ flexDirection: "row" }}>
+                                {renderStars(review.rating, 14)}
+                            </View>
                         </View>
-                    ))}
+                        <Text style={styles.reviewText}>{review.comment}</Text>
+                    </View>
+                ))}
             </View>
         </ScrollView>
     )
@@ -198,6 +221,34 @@ const ProductDetailScreen = () => {
 export default ProductDetailScreen
 
 const styles = StyleSheet.create({
+    cartButton: {
+        padding: 10,
+        backgroundColor: '#FFEDE8',
+        borderRadius: 12,
+        position: 'relative',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 44,
+        height: 44,
+    },
+    badge: {
+        position: 'absolute',
+        top: 4,
+        right: 4,
+        backgroundColor: '#B84953',
+        borderRadius: 9,
+        minWidth: 18,
+        height: 18,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 4,
+    },
+    badgeText: {
+        color: 'white',
+        fontSize: 12,
+        fontFamily: 'Inter_18pt-Medium',
+        lineHeight: 16,
+    },
     container: {
         padding: 20,
     },
@@ -214,13 +265,13 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         shadowColor: "#000",
         shadowOffset: {
-          width: 0,
-          height: 2,
+            width: 0,
+            height: 2,
         },
         shadowOpacity: 0.1,
         shadowRadius: 3.84,
         elevation: 5,
-      },
+    },
     row1: {
         borderLeftWidth: 0.4,
         borderColor: "#333333",
@@ -238,22 +289,22 @@ const styles = StyleSheet.create({
         backgroundColor: "#B84953",
         justifyContent: "center",
         alignItems: "center",
-      },
-      avatarText: {
+    },
+    avatarText: {
         color: "white",
         fontSize: 14,
         fontFamily: "Inter_18pt-Medium",
-      },
-      reviewerName: {
+    },
+    reviewerName: {
         fontSize: 14,
         fontFamily: "Inter_18pt-Medium",
         color: "#070707",
-      },
-      reviewerEmail: {
+    },
+    reviewerEmail: {
         fontSize: 10,
         fontFamily: "Inter_18pt-Regular",
         color: "#333333",
-      },
+    },
     col: {
         flex: 1,
         marginBottom: 10,
@@ -269,7 +320,7 @@ const styles = StyleSheet.create({
         color: "#333",
         fontFamily: "Inter_18pt-Regular",
         lineHeight: 20,
-      },
+    },
     value: {
         fontSize: 16,
         fontFamily: 'Inter_18pt-Regular',

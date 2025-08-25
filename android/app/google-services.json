@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "221330369652",
+    "project_id": "glowcart-5eaca",
+    "storage_bucket": "glowcart-5eaca.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:221330369652:android:369e40ce5c351651a97521",
+        "android_client_info": {
+          "package_name": "com.glowcart"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtraBuJfYgaZHuyi-Njg2PR9hNZlythDs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

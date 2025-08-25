@@ -1,9 +1,13 @@
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {View, Text, Image, StatusBar, TouchableOpacity, Dimensions} from 'react-native'  
 import { SafeAreaView } from 'react-native-safe-area-context'
 const {height, width} = Dimensions.get("window");
+type RootStackParamList = {
+    Login: undefined;    
+};
 const OnboardingScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   return (
     <SafeAreaView
       style={{

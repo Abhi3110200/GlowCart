@@ -12,11 +12,16 @@ import HelpIcon from "../assets/svg/QuestionIcon"
 import PrivacyIcon from "../assets/svg/PrivacyIcon"
 import SettingIcon from "../assets/svg/SettingIcon"
 import LogoutIcon from "../assets/svg/LogoutIcon"
+import { useAuth } from "../hooks/useAuth"
+import ActiveProfileIcon from "../assets/svg/ActiveProfileIcon"
 interface ProfileScreenProps {
   onBack?: () => void
 }
 
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ onBack }) => {
+  const { user, logout } = useAuth();
+  console.log(user);
+  
   const menuItems = [
     {
       icon:<LocationIcon width={24} height={24}/>,
@@ -65,21 +70,30 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onBack }) => {
       icon:<LogoutIcon width={24} height={24}/>,
       title: "Log Out",
       subtitle: "",
+      onPress: () => {
+        logout();
+      }
     },
   ]
 
   const renderMenuItem = (item: any, index: number) => (
-    <TouchableOpacity key={index} style={styles.menuItem}>
+    <TouchableOpacity key={index} style={styles.menuItem} onPress={item.onPress}>
       <View style={styles.menuItemLeft}>
-        {item.icon}  {/* <-- render your SVG here */}
+        <View style={styles.iconContainer}>
+          {item.icon}
+        </View>
         <View style={styles.menuItemText}>
-          <Text style={[styles.menuItemTitle,item.title === 'Log Out' ? styles.logoutText : styles.menuItemTitle]}>{item.title}</Text>
+          <Text style={[styles.menuItemTitle, item.title === 'Log Out' ? styles.logoutText : null]}>
+            {item.title}
+          </Text>
           {item.subtitle ? (
             <Text style={styles.menuItemSubtitle}>{item.subtitle}</Text>
           ) : null}
         </View>
       </View>
-      {item.title === 'Log Out' ? null : <Icon name="chevron-forward" size={20} color="#B0B0B0" />}
+      {item.title === 'Log Out' ? null : (
+        <Icon name="chevron-forward" size={20} color="#B0B0B0" />
+      )}
     </TouchableOpacity>
   )
 
@@ -98,15 +112,10 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onBack }) => {
       {/* User Profile Section */}
       <View style={styles.profileSection}>
         <View style={styles.profileInfo}>
-          <Image
-            source={{
-              uri: "https://in.images.search.yahoo.com/search/images;_ylt=Awr1UaNmtKtoKQIA.wO7HAx.;_ylu=Y29sbwNzZzMEcG9zAzEEdnRpZAMEc2VjA3Nj?type=E210IN885G0&p=imaegs&fr=mcafee&th=315&tw=474&imgurl=https%3A%2F%2Fi0.wp.com%2Fpicjumbo.com%2Fwp-content%2Fuploads%2Fbeautiful-nature-mountain-scenery-with-flowers-free-photo.jpg%3Fw%3D2210%26quality%3D70&rurl=https%3A%2F%2Fpicjumbo.com%2Fbeautiful-nature-mountain-scenery-with-flowers%2F&size=409KB&name=Beautiful+Nature+Mountain+Scenery+with+Flowers+Free+Stock+Photo+%7C+picjumbo&oid=1&h=1473&w=2210&turl=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.Mvcr0QDsGXOx29cSBfXd6AHaE7%3Fpid%3DApi&tt=Beautiful+Nature+Mountain+Scenery+with+Flowers+Free+Stock+Photo+%7C+picjumbo&sigr=i9WsaQE8_Dpx&sigit=sLDQJckM7CDv&sigi=ZOTAUYfw2glF&sign=AMi3kh5rYGF0&sigt=AMi3kh5rYGF0",
-            }}
-            style={styles.profileImage}
-          />
+          <ActiveProfileIcon width={60} height={60}/>
           <View style={styles.profileText}>
-            <Text style={styles.profileName}>Olivia</Text>
-            <Text style={styles.profileEmail}>olivia@gmail.com</Text>
+            <Text style={styles.profileName}>{user?.displayName}</Text>
+            <Text style={styles.profileEmail}>{user?.email}</Text>
           </View>
         </View>
         <TouchableOpacity style={styles.editButton}>
@@ -168,6 +177,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
+    gap:15,
   },
   profileImage: {
     width: 60,
@@ -200,13 +210,21 @@ const styles = StyleSheet.create({
 
   },
   menuItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 15,
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    // backgroundColor: '#fff',
     // borderBottomWidth: 1,
-    // borderBottomColor: "#F5F5F5",
+    // borderBottomColor: '#F5F5F5',
+  },
+  iconContainer: {
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
   },
   menuItemLeft: {
     flexDirection: "row",

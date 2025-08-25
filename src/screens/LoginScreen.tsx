@@ -1,28 +1,44 @@
 import { SafeAreaView } from "react-native-safe-area-context"
-import { Image, Text, TextInput, TouchableOpacity, View } from "react-native"
-import { useState } from "react"
+import { ActivityIndicator, Alert, Image, Text, TextInput, TouchableOpacity, View } from "react-native"
+import { FC, useState } from "react"
 import { Dimensions } from "react-native"
 import { StatusBar } from "react-native"
 import Ionicons from "react-native-vector-icons/Ionicons"
 import { useNavigation } from "@react-navigation/native"
-
+import { useAuth } from "../hooks/useAuth"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 const { height, width } = Dimensions.get("window")
+type RootStackParamList = {
+    Register: undefined;
+};
 
-const LoginScreen = () => {
+const LoginScreen : FC = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
+  const { login, loading, setLoading } = useAuth();  
 
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const handleLogin = () => {
-    console.log("[v0] Login pressed with:", { email, password })
-    navigation.navigate("Tabs")
+  const handleLogin = async () => {
+    if(!email || !password) {
+      Alert.alert("Error", "Email and password are required");
+      return;
+    }
+    try {
+      setLoading(true);
+      await login(email, password);
+    } catch (error) {
+      console.error("Login failed:", error);
+      // The error is already handled in the auth store
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FFEDE8", justifyContent: "space-between"}}>
-      <StatusBar barStyle="dark-content" backgroundColor="#C9A7A2" />
+      <StatusBar barStyle="light-content" backgroundColor="#F1B0B0" />
       <View
         style={{
           height: height * 0.25,
@@ -123,9 +139,17 @@ const LoginScreen = () => {
           }}
           onPress={() => handleLogin()}
         >
-          <Text style={{ fontSize: 24, fontFamily: "Inter_18pt-Medium", color: "#fff", textAlign: "center" }}>
-            Log in
-          </Text>
+          {loading ? (
+            <View style={{
+              paddingVertical: 8,
+            }}>
+              <ActivityIndicator size="small" color="#fff" />
+            </View>
+          ) : (
+            <Text style={{ fontSize: 24, fontFamily: "Inter_18pt-Medium", color: "#fff", textAlign: "center" }}>
+              Log in
+            </Text>
+          )}
         </TouchableOpacity>
 
         <View style={{ flexDirection: "row", gap: 10, alignItems: "center", justifyContent: "center", marginVertical: 30 }}>

@@ -1,39 +1,32 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StatusBar, TextInput, Dimensions, Image, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native'
+import React, { useEffect, useState, useRef, FC } from 'react';
+import { View, Text, StatusBar, TextInput, Dimensions, Image, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Animated } from 'react-native'
 import RBSheet from 'react-native-raw-bottom-sheet';
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons'
 import { useNavigation } from '@react-navigation/native'
+import CartIcon from '../assets/svg/CartIcon';
+import { Product } from '../types';
+import ProductCard from '../components/ProductCard';
+import { useCart } from '../hooks/useCart';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+type RootStackParamList = {
+    CartScreen: undefined;
+};
 
 const { width, height } = Dimensions.get('window');
 
-interface Product {
-    id: number;
-    title: string;
-    description: string;
-    price: number;
-    discountPercentage: number;
-    rating: number;
-    stock: number;
-    brand: string;
-    category: string;
-    thumbnail: string;
-    images: string[];
-}
-
-
-
-const HomeScreen = () => {
+const HomeScreen: FC = () => {
 
     const bottomSheetRef = useRef<any>(null);
-    const navigation = useNavigation();
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
     const [products, setProducts] = useState<Product[]>([])
     const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState('')
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+    const { items } = useCart()
 
     const fetchProducts = async () => {
         try {
@@ -64,6 +57,7 @@ const HomeScreen = () => {
     }, []);
 
 
+
     console.log(products)
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#FFEDE8' }}>
@@ -79,24 +73,68 @@ const HomeScreen = () => {
                         fontFamily: 'Italiana-Regular',
                         fontSize: 30,
                     }}>Viorra</Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                         <View style={{
                             position: 'relative',
+                            padding: 5,
                         }}>
                             <MaterialIcons name="notifications-none" size={width * 0.06} color="#4B4B4B" />
                             <View style={{
-                                position: 'absolute',
-                                top: 1,
-                                right: 3,
-                                width: 10,
-                                height: 10,
-                                backgroundColor: '#B84953',
-                                borderRadius: 6,
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                            }} />
+                                    position: 'absolute',
+                                    top: 0,
+                                    right: 0,
+                                    minWidth: 18,
+                                    height: 18,
+                                    backgroundColor: '#B84953',
+                                    borderRadius: 9,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    paddingHorizontal: 4,
+                                }}>
+                                    <Text style={{
+                                        color: 'white',
+                                        fontSize: 10,
+                                        fontFamily: 'Inter_18pt-Medium',
+                                    }}>
+                                        0
+                                    </Text>
+                                </View>
                         </View>
-                        <SimpleLineIcons name="bag" size={width * 0.05} color="#4B4B4B" />
+                        <TouchableOpacity 
+                            onPress={() => navigation.navigate('CartScreen')} 
+                            activeOpacity={0.8}
+                            style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                position: 'relative',
+                                padding: 5,
+                            }}
+                        >
+                            <CartIcon width={width * 0.05} height={width * 0.05} color="#4B4B4B" />
+                            {items.length > 0 && (
+                                <View style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    right: 0,
+                                    minWidth: 18,
+                                    height: 18,
+                                    backgroundColor: '#B84953',
+                                    borderRadius: 9,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    paddingHorizontal: 4,
+                                }}>
+                                    <Text style={{
+                                        color: 'white',
+                                        fontSize: 10,
+                                        fontFamily: 'Inter_18pt-Medium',
+                                    }}>
+                                        {items.length > 9 ? '9+' : items.length}
+                                    </Text>
+                                </View>
+                            )}
+                        </TouchableOpacity>
                     </View>
                 </View>
                 <View style={{
@@ -127,8 +165,7 @@ const HomeScreen = () => {
                     <ActivityIndicator size="large" color="#B84953" />
                 </View>
             ) : (
-                <ScrollView style={{
-                }}>
+                <ScrollView showsVerticalScrollIndicator={false}>
                     <View style={{
                         flexDirection: 'row',
                         justifyContent: 'space-between',
@@ -171,31 +208,14 @@ const HomeScreen = () => {
                     <ScrollView contentContainerStyle={styles.productsContainer}>
                         <View style={styles.productsGrid}>
                             {filteredProducts.map((item) => (
-                                <TouchableOpacity
-                                    onPress={() => navigation.navigate('ProductDetailScreen', { product: item })}
+                                <ProductCard
                                     key={item.id.toString()}
-                                    style={styles.productCard}
-                                    activeOpacity={0.8}
-                                >
-                                    <Image
-                                        source={{ uri: item.thumbnail }}
-                                        style={styles.productImage}
-                                        resizeMode="contain"
-                                    />
-
-                                    <View style={styles.productInfo}>
-                                        <Text style={styles.titleText} numberOfLines={1}>
-                                            {item.title}
-                                        </Text>
-                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <Text style={styles.priceText}>${item.price.toFixed(2)}</Text>
-                                            <TouchableOpacity activeOpacity={0.8}>
-                                                <Ionicons name="heart-outline" size={25} color="#4B4B4B" />
-                                            </TouchableOpacity>
-                                        </View>
-                                    </View>
-
-                                </TouchableOpacity>
+                                    product={item}
+                                    onAddToWishlist={() => {
+                                        // Add your wishlist logic here
+                                        console.log('Added to wishlist:', item.id);
+                                    }}
+                                />
                             ))}
                         </View>
                     </ScrollView>
@@ -235,12 +255,17 @@ const HomeScreen = () => {
                     </View>
                 </View>
             </RBSheet>
-
         </SafeAreaView>
-    )
-}
+    );
+};
+
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#FFEDE8',
+        position: 'relative',
+    },
     loadingContainer: {
         flex: 1,
         justifyContent: 'center',
