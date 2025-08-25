@@ -21,7 +21,7 @@ const LoginScreen = () => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#FFEDE8" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#FFEDE8", justifyContent: "space-between"}}>
       <StatusBar barStyle="dark-content" backgroundColor="#C9A7A2" />
       <View
         style={{
@@ -36,12 +36,12 @@ const LoginScreen = () => {
         }}
       >
         <Text style={{ fontSize: 34, fontFamily: "PlayfairDisplay-SemiBold", color: "#B84953" }}>Hello Again!</Text>
-        <Text style={{ fontSize: 26, fontFamily: "Inter_18pt-Medium", textAlign: "center", color: "#AD7373" }}>
+        <Text style={{ fontSize: 26, fontFamily: "Inter_18pt-Medium", textAlign: "center", color: "#AD7373", paddingHorizontal: 50 }}>
           Welcome back you've been missed.
         </Text>
       </View>
 
-      <View style={{ padding: 25, marginTop: 30 }}>
+      <View style={{ padding: 25, }}>
         <View
           style={{
             backgroundColor: "#fff",
@@ -113,13 +113,13 @@ const LoginScreen = () => {
           style={{
             marginTop: 30,
             paddingVertical: 12,
-            borderRadius: 12,
+            borderRadius: 16,
             backgroundColor: "#B84953",
             shadowColor: "#000",
-            shadowOffset: { width: 0, height: 3 },
+            shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.25,
-            shadowRadius: 10,
-            elevation: 5,
+            shadowRadius: 100,
+            elevation: 10,
           }}
           onPress={() => handleLogin()}
         >
@@ -128,15 +128,13 @@ const LoginScreen = () => {
           </Text>
         </TouchableOpacity>
 
-        <View style={{ flexDirection: "row", gap: 10, alignItems: "center", justifyContent: "center", marginTop: 30 }}>
+        <View style={{ flexDirection: "row", gap: 10, alignItems: "center", justifyContent: "center", marginVertical: 30 }}>
           <View style={{ width: "25%", height: 1, backgroundColor: "#989696" }} />
           <Text style={{ fontSize: 16, fontFamily: "Inter_18pt-Medium", color: "#6C6C6C", textAlign: "center" }}>
             Or Continue With
           </Text>
           <View style={{ width: "25%", height: 1, backgroundColor: "#989696" }} />
         </View>
-      </View>
-
       <View style={{ flexDirection: "row", gap: 30, alignItems: "center", justifyContent: "center" }}>
         <TouchableOpacity
           style={{
@@ -175,20 +173,16 @@ const LoginScreen = () => {
           <Image source={require('../assets/images/facebook.png')} style={{ width: 30, height: 30 }} resizeMode="contain" />
         </TouchableOpacity>
       </View>
+      </View>
 
-      <TouchableOpacity onPress={() => console.log("[v0] Register pressed")}>
-        <Text
-          style={{
-            fontSize: 16,
-            fontFamily: "Inter_18pt-Medium",
-            color: "#6C6C6C",
-            textAlign: "center",
-            marginTop: 80,
-          }}
-        >
-          Not a Member? <Text style={{ color: "#B84953", fontFamily: "Inter_18pt-Medium" }}>Register Now</Text>
-        </Text>
-      </TouchableOpacity>
+
+      <View style={{ flexDirection: "row", gap: 5, alignItems: "center", justifyContent: "center", marginVertical: 30 }}>
+                <Text style={{ fontSize: 16, fontFamily: "Inter_18pt-Regular", color: "#6C6C6C", textAlign: "center" }}>Not a Member? </Text>
+                <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+
+                    <Text style={{ fontSize: 16, color: "#B84953", fontFamily: "Inter_18pt-Medium" }}>Register Now</Text>
+                </TouchableOpacity>
+            </View>
     </SafeAreaView>
   )
 }

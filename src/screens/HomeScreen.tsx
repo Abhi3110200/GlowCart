@@ -172,7 +172,7 @@ const HomeScreen = () => {
                         <View style={styles.productsGrid}>
                             {filteredProducts.map((item) => (
                                 <TouchableOpacity
-                                    onPress={() => navigation.navigate('ProductDetailScreen', { item })}
+                                    onPress={() => navigation.navigate('ProductDetailScreen', { product: item })}
                                     key={item.id.toString()}
                                     style={styles.productCard}
                                     activeOpacity={0.8}

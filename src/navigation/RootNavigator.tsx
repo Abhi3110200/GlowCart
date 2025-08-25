@@ -5,6 +5,7 @@ import ProductDetailScreen from "../screens/ProductDetailScreen";
 import React from "react";
 import LoginScreen from "../screens/LoginScreen";
 import TabNavigator from "./TabNavigator";
+import RegisterScreen from "../screens/RegisterScreen";
 const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
@@ -14,6 +15,7 @@ const RootNavigator = () => {
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Tabs" component={TabNavigator} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="ProductDetailScreen" component={ProductDetailScreen} />
       </Stack.Navigator>
     </NavigationContainer>
