@@ -3,15 +3,17 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import OnboardingScreen from "../screens/OnboardingScreen";
 import ProductDetailScreen from "../screens/ProductDetailScreen";
 import React from "react";
-import HomeScreen from "../screens/HomeScreen";
+import LoginScreen from "../screens/LoginScreen";
+import TabNavigator from "./TabNavigator";
 const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Onboarding" screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName="Onboarding" screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Tabs" component={TabNavigator} />
         <Stack.Screen name="ProductDetailScreen" component={ProductDetailScreen} />
       </Stack.Navigator>
     </NavigationContainer>
