@@ -19,7 +19,7 @@ import type { CartItem } from '../store/cartStore';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 type RootStackParamList = {
-    Home: undefined;
+    Tabs: undefined;
 };
 
 const { width } = Dimensions.get('window');
@@ -54,7 +54,7 @@ const CartScreen = () => {
       Alert.alert('Your cart is empty', 'Add some products to your cart before checkout');
       return;
     }
-    navigation.navigate('Home');
+    navigation.navigate('Tabs');
   };
 
   const renderCartItem = (item: CartItem) => (

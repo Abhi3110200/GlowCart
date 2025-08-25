@@ -4,7 +4,7 @@ GlowCart is a modern, responsive e-commerce mobile application built with React 
 
 ## 🎥 Demo Video
 
-[Click here to watch the demo video](YOUR_VIDEO_LINK_HERE)
+[Click here to watch the demo video](./src/assets/images/20250825-2154-27.7784817.mp4)
 
 ## ✨ Features
 
@@ -17,24 +17,25 @@ GlowCart is a modern, responsive e-commerce mobile application built with React 
 ## 📸 Screenshots
 
 ### Onboarding Screen
-![alt text](image.png)
+![alt text](./src/assets/images/image.png)
 
 ### Login Screen
-![alt text](image-1.png)
+![alt text](./src/assets/images/image-1.png)
 
 
 ### Register Screen
-![alt text](image-2.png)
+![alt text](./src/assets/images/image-2.png)
 
 ### Home Screen
-![alt text](image-3.png)
+![alt text](./src/assets/images/image-3.png)
 
 ### Profile Screen
-![alt text](image-4.png)
+![alt text](./src/assets/images/image-4.png)
 
 ### Cart Screen
-![alt text](image-5.png)
-![alt text](image-6.png)
+![alt text](./src/assets/images/image-5.png)
+![alt text](./src/assets/images/image-6.png)
+
 ## 🚀 Installation
 
 ### Prerequisites
