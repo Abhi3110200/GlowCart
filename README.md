@@ -4,7 +4,7 @@ GlowCart is a modern, responsive e-commerce mobile application built with React 
 
 ## 🎥 Demo Video
 
-[Click here to watch the demo video](./src/assets/images/20250825-2154-27.7784817.mp4)
+[Click here to watch the demo video](https://drive.google.com/file/d/1NhxpUNqCQJUTLaNarH0LRoS4uBziGiCz/view?usp=sharing)
 
 ## ✨ Features
 
@@ -64,12 +64,8 @@ GlowCart is a modern, responsive e-commerce mobile application built with React 
    cd ios && pod install && cd ..
    ```
 
-4. **Start the development server:**
-   ```bash
-   npx react-native start
-   ```
 
-5. **Run the app:**
+4. **Run the app:**
    ```bash
    # For Android
    npx react-native run-android
