@@ -22,6 +22,7 @@ type AuthState = {
   logout: () => Promise<void>;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
+  initializeAuth: () => Promise<void>;
 };
 
 export const useAuthStore = create<AuthState>()(
@@ -136,7 +137,7 @@ export const useAuthStore = create<AuthState>()(
     
     logout: async () => {
       try {
-        await auth().signOut;
+        await auth().signOut();
         set({
           user: null,
           token: null,
@@ -150,6 +151,39 @@ export const useAuthStore = create<AuthState>()(
     
     setLoading: (loading: boolean) => set({ loading }),
     setError: (error: string | null) => set({ error }),
+    initializeAuth: async () => {
+      try {
+        set({ loading: true });
+        const currentUser = auth().currentUser;
+        
+        if (currentUser) {
+          const token = await currentUser.getIdToken();
+          const userDoc = await firestore()
+            .collection('users')
+            .doc(currentUser.uid)
+            .get();
+            
+          const userData = userDoc.data() as UserData;
+          
+          set({
+            user: {
+              uid: currentUser.uid,
+              email: currentUser.email || '',
+              displayName: userData?.displayName || '',
+              createdAt: userData?.createdAt || new Date(),
+            },
+            token,
+            isAuthenticated: true,
+            loading: false,
+          });
+        } else {
+          set({ loading: false });
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        set({ loading: false });
+      }
+    },
     }),
     {
       name: 'auth-storage',

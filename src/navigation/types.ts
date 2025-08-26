@@ -1,5 +1,9 @@
 export type RootStackParamList = {
-  Home: undefined;
-  ProductDetail: { product: any };
-  // Add other screen params as needed
+  Tabs: undefined;
+  Auth: undefined;
+  Onboarding: undefined;
+  Login: undefined;
+  Register: undefined;
+  ProductDetailScreen: { productId: string };
+  CartScreen: undefined;
 };

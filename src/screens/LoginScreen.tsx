@@ -5,8 +5,8 @@ import { Dimensions } from "react-native"
 import { StatusBar } from "react-native"
 import Ionicons from "react-native-vector-icons/Ionicons"
 import { useNavigation } from "@react-navigation/native"
-import { useAuth } from "../hooks/useAuth"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+import { useAuthContext } from "../providers/AuthProvider"
 const { height, width } = Dimensions.get("window")
 type RootStackParamList = {
     Register: undefined;
@@ -16,7 +16,7 @@ const LoginScreen : FC = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false);
-  const { login, loading, setLoading } = useAuth();  
+  const { login, loading, setLoading } = useAuthContext();  
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 

@@ -12,7 +12,8 @@ export const useAuth = () => {
     register, 
     logout,
     setLoading,
-    setError
+    setError,
+    initializeAuth,
   } = useAuthStore();
 
   return {
@@ -25,7 +26,8 @@ export const useAuth = () => {
     register,
     logout,
     setLoading,
-    setError
+    setError,
+    initializeAuth,
   };
 };
 

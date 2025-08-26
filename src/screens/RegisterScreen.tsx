@@ -6,7 +6,7 @@ import { StatusBar } from "react-native"
 import Ionicons from "react-native-vector-icons/Ionicons"
 import { useNavigation } from "@react-navigation/native"
 import { Alert } from "react-native"
-import { useAuth } from "../hooks/useAuth"
+import { useAuthContext } from "../providers/AuthProvider"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 const { height, width } = Dimensions.get("window")
 
@@ -22,7 +22,7 @@ const RegisterScreen = () => {
     const [confirmPassword, setConfirmPassword] = useState("")
 
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-    const { register, setLoading, loading, setError } = useAuth();
+    const { register, setLoading, loading, setError } = useAuthContext();
 
     const handleRegister = () => {
         if(!email || !password || !name || !confirmPassword) {

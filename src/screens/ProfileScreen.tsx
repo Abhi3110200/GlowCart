@@ -12,14 +12,14 @@ import HelpIcon from "../assets/svg/QuestionIcon"
 import PrivacyIcon from "../assets/svg/PrivacyIcon"
 import SettingIcon from "../assets/svg/SettingIcon"
 import LogoutIcon from "../assets/svg/LogoutIcon"
-import { useAuth } from "../hooks/useAuth"
+import { useAuthContext } from "../providers/AuthProvider"
 import ActiveProfileIcon from "../assets/svg/ActiveProfileIcon"
 interface ProfileScreenProps {
   onBack?: () => void
 }
 
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ onBack }) => {
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuthContext();
   console.log(user);
   
   const menuItems = [

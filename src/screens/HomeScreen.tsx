@@ -78,7 +78,7 @@ const HomeScreen: FC = () => {
                             position: 'relative',
                             padding: 5,
                         }}>
-                            <MaterialIcons name="notifications-none" size={width * 0.06} color="#4B4B4B" />
+                            <MaterialIcons name="notifications-none" size={width * 0.05} color="#4B4B4B" />
                             <View style={{
                                     position: 'absolute',
                                     top: 0,

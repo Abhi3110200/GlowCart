@@ -34,7 +34,9 @@ const CartScreen = () => {
   }, [items]);
 
   const handleQuantityChange = (item: CartItem, newQuantity: number) => {
-    if (newQuantity < 1) return;
+    if (newQuantity < 1){
+      removeItem(item.id);
+    }
     updateItem(item.id, newQuantity);
   };
 
@@ -54,7 +56,7 @@ const CartScreen = () => {
       Alert.alert('Your cart is empty', 'Add some products to your cart before checkout');
       return;
     }
-    navigation.navigate('Tabs');
+    navigation.replace('Tabs');
   };
 
   const renderCartItem = (item: CartItem) => (
