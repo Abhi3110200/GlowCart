@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, FC } from 'react';
-import { View, Text, StatusBar, TextInput, Dimensions, Image, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Animated } from 'react-native'
+import { View, Text, StatusBar, TextInput, Dimensions, Image, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Animated, FlatList } from 'react-native'
 import RBSheet from 'react-native-raw-bottom-sheet';
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -28,18 +28,57 @@ const HomeScreen: FC = () => {
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
     const { items } = useCart()
 
-    const fetchProducts = async () => {
-        try {
-            const response = await fetch('https://dummyjson.com/products')
-            const data = await response.json()
-            setProducts(data.products);
-            setFilteredProducts(data.products);  // The API returns an object with a 'products' array
-            setLoading(false)
-        } catch (error) {
-            console.error('Error fetching products:', error)
-            setLoading(false)
+    const [page, setPage] = useState(1);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+    const pageSize = 10;
+
+    const fetchProducts = async (pageNum = 1, loadMore = false) => {
+        if ((loadingMore && pageNum === 1) || (!loadMore && !loadingMore)) {
+            setLoading(true);
         }
-    }
+
+        try {
+            const response = await fetch(
+                `https://dummyjson.com/products?limit=${pageSize}&skip=${(pageNum - 1) * pageSize}`
+            );
+            const data = await response.json();
+
+            if (loadMore) {
+                setProducts(prev => [...prev, ...data.products]);
+            } else {
+                setProducts(data.products);
+            }
+
+            // Check if we've reached the end of the list
+            setHasMore(data.products.length === pageSize);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        } finally {
+            setLoading(false);
+            setLoadingMore(false);
+        }
+    };
+
+    const loadMoreProducts = () => {
+        if (!loadingMore && hasMore) {
+            setLoadingMore(true);
+            setPage(prev => {
+                const nextPage = prev + 1;
+                fetchProducts(nextPage, true);
+                return nextPage;
+            });
+        }
+    };
+
+    // Add this function to handle refresh
+    const handleRefresh = () => {
+        setPage(1);
+        setHasMore(true);
+        fetchProducts(1, false);
+    };
+
+
 
     useEffect(() => {
         if (searchQuery.trim() === '') {
@@ -80,28 +119,28 @@ const HomeScreen: FC = () => {
                         }}>
                             <MaterialIcons name="notifications-none" size={width * 0.05} color="#4B4B4B" />
                             <View style={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    right: 0,
-                                    minWidth: 18,
-                                    height: 18,
-                                    backgroundColor: '#B84953',
-                                    borderRadius: 9,
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    paddingHorizontal: 4,
+                                position: 'absolute',
+                                top: 0,
+                                right: 0,
+                                minWidth: 18,
+                                height: 18,
+                                backgroundColor: '#B84953',
+                                borderRadius: 9,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                paddingHorizontal: 4,
+                            }}>
+                                <Text style={{
+                                    color: 'white',
+                                    fontSize: 10,
+                                    fontFamily: 'Inter_18pt-Medium',
                                 }}>
-                                    <Text style={{
-                                        color: 'white',
-                                        fontSize: 10,
-                                        fontFamily: 'Inter_18pt-Medium',
-                                    }}>
-                                        0
-                                    </Text>
-                                </View>
+                                    0
+                                </Text>
+                            </View>
                         </View>
-                        <TouchableOpacity 
-                            onPress={() => navigation.navigate('CartScreen')} 
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate('CartScreen')}
                             activeOpacity={0.8}
                             style={{
                                 flexDirection: 'row',
@@ -165,61 +204,100 @@ const HomeScreen: FC = () => {
                     <ActivityIndicator size="large" color="#B84953" />
                 </View>
             ) : (
-                <ScrollView showsVerticalScrollIndicator={false}>
-                    <View style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        paddingHorizontal: 20,
-                        marginVertical: 20,
-                    }}>
-                        <View>
-                            <Text style={{
-                                fontSize: 24,
-                                color: '#000000',
-                                fontFamily: 'Inter_18pt-Medium',
-                            }}>Best Products</Text>
-                            <Text style={{
-                                fontSize: 14,
-                                color: '#4B4B4B',
-                                fontFamily: 'Inter_14pt-Regular',
-                            }}>{products.length} products</Text>
+                <FlatList
+                    data={filteredProducts}
+                    keyExtractor={(item) => item.id.toString()}
+                    onEndReached={loadMoreProducts}
+                    onEndReachedThreshold={0.5}
+                    onRefresh={handleRefresh}
+                    refreshing={loading && !loadingMore}
+                    ListHeaderComponent={
+                        <View style={{
+                            //   paddingHorizontal: 20,
+                            marginTop: 20,
+                        }}>
+                            <View style={{
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                marginBottom: 20,
+                            }}>
+                                <View>
+                                    <Text style={{
+                                        fontSize: 24,
+                                        color: '#000000',
+                                        fontFamily: 'Inter_18pt-Medium',
+                                    }}>Best Products</Text>
+                                    <Text style={{
+                                        fontSize: 14,
+                                        color: '#4B4B4B',
+                                        fontFamily: 'Inter_14pt-Regular',
+                                    }}>
+                                        {searchQuery.trim() === '' ? products.length : filteredProducts.length} products
+                                    </Text>
+                                </View>
+                                <TouchableOpacity
+                                    onPress={() => bottomSheetRef.current?.open()}
+                                    activeOpacity={0.8}
+                                    style={{
+                                        backgroundColor: 'white',
+                                        borderRadius: 8,
+                                        paddingHorizontal: 20,
+                                        paddingVertical: 10,
+                                        borderWidth: 0.6,
+                                        borderColor: '#8F8F8F',
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        gap: 20,
+                                    }}>
+                                    <Text style={{
+                                        fontSize: 12,
+                                        color: '#424242',
+                                        fontFamily: 'Inter_18pt-Medium',
+                                    }}>Apply Filter</Text>
+                                    <Ionicons name="chevron-down" size={width * 0.045} color="#4B4B4B" />
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                        <TouchableOpacity onPress={() => bottomSheetRef.current.open()} activeOpacity={0.8} style={{
-                            backgroundColor: 'white',
-                            borderRadius: 8,
-                            paddingHorizontal: 20,
-                            paddingVertical: 10,
-                            borderWidth: 0.6,
-                            borderColor: '#8F8F8F',
-                            flexDirection: 'row',
+                    }
+                    renderItem={({ item }) => (
+                        <ProductCard
+                            product={item}
+                            onAddToWishlist={() => {
+                                console.log('Added to wishlist:', item.id);
+                            }}
+                        />
+                    )}
+                    ListFooterComponent={() => {
+                        if (!loadingMore) return null;
+                        return (
+                            <View style={{ padding: 10 }}>
+                                <ActivityIndicator size="small" color="#B84953" />
+                            </View>
+                        );
+                    }}
+                    numColumns={2}
+                    columnWrapperStyle={styles.productsGrid}
+                    contentContainerStyle={styles.productsContainer}
+                    showsVerticalScrollIndicator={false}
+                    ListEmptyComponent={
+                        <View style={{
+                            flex: 1,
+                            justifyContent: 'center',
                             alignItems: 'center',
-                            justifyContent: 'space-between',
-                            gap: 20,
+                            padding: 20,
                         }}>
                             <Text style={{
-                                fontSize: 12,
-                                color: '#424242',
-                                fontFamily: 'Inter_18pt-Medium',
-                            }}>Apply Filter</Text>
-                            <Ionicons name="chevron-down" size={width * 0.045} color="#4B4B4B" />
-                        </TouchableOpacity>
-                    </View>
-                    <ScrollView contentContainerStyle={styles.productsContainer}>
-                        <View style={styles.productsGrid}>
-                            {filteredProducts.map((item) => (
-                                <ProductCard
-                                    key={item.id.toString()}
-                                    product={item}
-                                    onAddToWishlist={() => {
-                                        // Add your wishlist logic here
-                                        console.log('Added to wishlist:', item.id);
-                                    }}
-                                />
-                            ))}
+                                fontSize: 16,
+                                color: '#4B4B4B',
+                                fontFamily: 'Inter_18pt-Regular',
+                            }}>
+                                {loading ? 'Loading...' : 'No products found'}
+                            </Text>
                         </View>
-                    </ScrollView>
-                </ScrollView>
+                    }
+                />
             )}
 
             <RBSheet

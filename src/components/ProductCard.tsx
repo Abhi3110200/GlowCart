@@ -29,8 +29,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToWishlist, onP
   const isWishlisted = isInWishlist(product.id);
 
   useEffect(() => {
-    // Stagger the animation based on index
-    const delay = Math.min(index * 50, 500); // Max 500ms delay
+    const delay = Math.min(index * 50, 500);
     
     Animated.parallel([
       Animated.timing(fadeAnim, {
@@ -61,10 +60,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToWishlist, onP
       removeFromWishlist(product.id);
     } else {
       addToWishlist(product);
-      console.log("Product added to wishlist:", product);
     }
     
-    // Call the onAddToWishlist prop if provided (for any additional handling)
     if (onAddToWishlist) {
       onAddToWishlist();
     }
